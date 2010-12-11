@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>Basic</title>
+</head>
+<body>
+    <script type="application/javascript;version=1.7">
+    // This is a generator function
+    function naturalNumbers(){
+        var i = 0
+        while (true){
+            yield i++
+        }
+    }
+    var N = naturalNumbers() // N is now a generator
+    console.log(N.next()) // prints 0
+    console.log(N.next()) // prints 1
+    console.log(N.next()) // prints 2
+    // and so forth
+    </script>
+</body>
+</html>

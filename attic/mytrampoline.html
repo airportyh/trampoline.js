@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+  <title>My Trampoline</title>
+</head>
+<body>
+    
+<script type="application/javascript;version=1.7">
+
+function add(x,y){
+    yield x + y
+}
+
+function fib(n){
+    if (n == 1 || n == 2)
+        yield 1
+    else
+        yield (yield fib(n-1)) + (yield fib(n-2))
+}
+
+function sleep(ms){
+    setTimeout((yield Continue), ms)
+    yield Suspend
+}
+
+function main(){
+    console.log(yield add((yield add(2, 3)),1))
+    console.log(yield fib(10))
+}
+
+
+
+Array.prototype.last = function(){
+    return this[this.length - 1]
+}
+
+var Suspend = { toString: function() { return "[object SUSPEND]" } };
+var Continue = { toString: function() { return "[object CONTINUATION]" } };
+
+function isGenerator(obj){
+    return String(obj) === '[object Generator]'
+}
+
+function Runner(program){
+    var self = this
+    this.resume = function(retval){
+        self.run()
+    }
+    this.genStack = [program]
+    this.retval = undefined
+}
+Runner.prototype.run = function run(program){
+    try{
+        while (true){
+            var gen = this.genStack.last()
+            if (!gen) break
+            this.retval = gen.send(this.retval)
+            if (isGenerator(this.retval)){
+                this.genStack.push(this.retval)
+                this.retval = undefined
+            }else if(this.retval === Suspend){
+                break
+            }else if(this.retval === Continue){
+                this.retval = this.resume
+            }else{
+                this.genStack.pop().close()
+            }
+        }
+    }catch(e if e === StopIteration){
+        console.log('Program ended.')
+    }
+}
+
+function run(program){
+    new Runner(program).run()
+}
+
+run(main())
+
+
+</script>    
+<body>
+</html>

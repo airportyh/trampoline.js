@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>Trampoline JS</title>
+</head>
+<body>
+<script type="application/javascript;version=1.7">
+function add(x,y){
+    yield x + y
+}
+
+function main(){
+    var r = yield add(2,2)
+    console.log(r)
+    yield
+}
+
+function run(){
+    var m = main()
+    var sub = m.next()
+    var result = sub.next()
+    m.send(result)
+}
+
+run()
+</script>
+</body>
+</html>

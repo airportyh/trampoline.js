@@ -1,0 +1,53 @@
+<html>
+<head>
+    <title>Run</title>
+</head>
+<body>
+<script type="application/javascript;version=1.7">
+function run(gen){
+    // is object a generator?
+    function isGenerator(obj){
+        return String(obj) === '[object Generator]'
+    }
+    // last element of array
+    function last(arr){
+        return arr[arr.length - 1]
+    }
+    var stack = []
+    var retval = gen
+    try{
+        while (true){
+            if (isGenerator(retval)){   // if a generator
+                stack.push(retval)      // push it onto the stack
+                retval = undefined
+            }else{
+                stack.pop().close()     // if we got a normal value
+                                        // pop the stack and
+            }
+            gen = last(stack)           // get the generator at top of the stack
+            if (!gen) break
+            retval = gen.send(retval)   // send retval to the generator
+                                        // if retval is undefined, it acts just
+                                        // like next()
+        }
+    }catch(e if e === StopIteration){
+        console.log('Program ended.')
+    }
+}
+
+function fib(n){
+    if (n == 1 || n == 2)
+        yield 1
+    else
+        yield (yield fib(n-1)) + (yield fib(n-2))
+}
+
+function main(){
+    var r = yield fib(8)
+    console.log(r)
+}
+
+run(main())
+</script>
+</body>
+</html>

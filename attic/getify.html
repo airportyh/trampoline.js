@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <title>Getify</title>
+</head>
+<body>
+<script src="runner.js" type="application/javascript;version=1.7"></script>
+<script type="application/javascript;version=1.7">
+
+function _xhr(url, callback){
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', url)
+    xhr.onreadystatechange = function(){
+        if (this.readyState == 4)
+            callback(this.responseText)
+    }
+    xhr.send()
+}
+
+function sleep(millis) {
+    setTimeout((yield Continue), millis)
+    yield Suspend
+}
+
+function xhr(url){
+    _xhr(url, (yield Continue))
+    yield Suspend
+}
+
+function example(){
+    yield sleep(1000)
+    var greeting = yield xhr('/something.ajax?greeting')
+    var who = yield xhr('/else.ajax?who&greeting=' + greeting)
+    console.log(greeting + ' ' + who)
+}
+
+run(example())
+</script>
+</body>
+</html>

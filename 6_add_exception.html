@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>Run</title>
+</head>
+<body>
+<script type="application/javascript;version=1.7">
+
+window.Continuation = {}
+window.Suspend = {}
+
+function run(gen){
+    function isGenerator(obj){
+        return String(obj) === '[object Generator]'
+    }
+    function last(arr){
+        return arr[arr.length - 1]
+    }
+    function startBouncing(retval){
+        try{
+            while (true){
+                if (isGenerator(retval)){
+                    stack.push(retval)
+                    retval = undefined
+                }else if (retval === Suspend){
+                    break                       // to suspend execution:
+                                                // just break out of this
+                                                // while-loop.
+                                                // we can later resume
+                                                // by re-starting another
+                                                // while-loop by calling
+                                                // startBouncing() again
+                }else if (retval === Continuation){
+                    retval = startBouncing
+                }else if (retval instanceof Error){
+                    stack.pop().close()
+                    last(stack).throw(retval)
+                }else{
+                    stack.pop().close()
+                }
+                gen = last(stack)
+                if (!gen) break
+                retval = gen.send(retval)
+            }
+        }catch(e if e === StopIteration){
+            console.log('Program ended.')
+        }
+    }    
+    var stack = []
+    var retval
+    startBouncing(gen)
+}
+
+function _xhr(url, callback){
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', url)
+    xhr.onreadystatechange = function(){
+        if (this.readyState == 4){
+            if (this.status === 200)
+                callback(this.responseText)
+            else{
+                var ex = new Error("XMLHttpRequest Error: " + 
+                    this.statusText + ': ' + this.status)
+                callback(ex)
+            }
+        }
+    }
+    xhr.send()
+}
+
+function sleep(millis) {
+    setTimeout((yield Continuation), millis)
+    yield Suspend
+}
+
+function xhr(url){
+    _xhr(url, (yield Continuation))
+    yield Suspend
+}
+
+function main(){
+    try{
+        var result = yield xhr('/doesnotexist.ajax')
+        console.log('blah')
+    }catch(e){
+        console.log('exception caught: ' + e)
+    }
+}
+
+run(main())
+</script>
+</body>
+</html>

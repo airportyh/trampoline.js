@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <title>Play</title>
+
+</head>
+<body>
+<script src="runner.js" type="application/javascript;version=1.7"></script>
+<script type="application/javascript;version=1.7">
+
+function _xhr(url, callback){
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', url)
+    xhr.onreadystatechange = function(){
+        if (this.readyState == 4){
+            if (this.status === 200)
+                callback(this.responseText)
+            else{
+                callback(new Error(url + ' ' + this.statusText + ' - ' + this.status), 
+                    true)
+            }
+        }
+    }
+    xhr.send()
+}
+
+function sleep(millis) {
+    setTimeout((yield Continue), millis)
+    yield Suspend
+}
+
+function xhr(url){
+    _xhr(url, (yield Continue))
+    yield Suspend
+}
+
+function main(){
+    
+    yield sleep(1000)
+    console.log(1)
+    yield sleep(1000)
+    console.log(2)
+    yield sleep(1000)
+    console.log(3)
+    
+    var text
+    text = yield xhr('example.js')
+    console.log(text)
+    try{
+        text = yield xhr('example2.js')
+    }catch(e){
+        console.log('error caught: ' + e)
+    }
+    
+}
+
+run(main())
+</script>  
+</body>
+</html>

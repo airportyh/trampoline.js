@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <title>Printer</title>
+</head>
+<body>
+<script type="application/javascript;version=1.7">
+function makePrinter(){
+    while(true){
+        var message = (yield)
+        console.log(message)
+    }
+}
+var printer = makePrinter()
+printer.next()
+printer.send('Hello')
+printer.send('I am sending this message')
+printer.send('into the generator')
+printer.send('and it be received and get printed')
+</script>
+<body>
+</html>
