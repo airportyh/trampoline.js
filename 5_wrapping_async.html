@@ -30,7 +30,10 @@ function run(gen){
                                                 // while-loop by calling
                                                 // startBouncing() again
                 }else if (retval === Continuation){
-                    retval = startBouncing
+                    retval = startBouncing      // send startBouncing
+                                                // back as the callback
+                                                // handler to the async
+                                                // function call
                 }else{
                     stack.pop().close()
                 }
@@ -51,8 +54,10 @@ function _xhr(url, callback){
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url)
     xhr.onreadystatechange = function(){
-        if (this.readyState == 4)
+        if (this.readyState == 4){
+            // send the responseText as the first arg of the continuation
             callback(this.responseText)
+        }
     }
     xhr.send()
 }
